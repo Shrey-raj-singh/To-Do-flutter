@@ -24,7 +24,28 @@ class _HomeScreenState extends State<HomeScreen> {
             child: Column(
               children: [
                 _searchBar(),
-                _ToDoList(todosList: todosList)
+                Expanded(
+                  child: ListView(
+                    children: [
+                      Container(
+                        margin: EdgeInsets.only(top: 50, bottom: 20),
+                        child: Text(
+                          "All To-Dos",
+                          style: TextStyle(
+                            fontSize: 30,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ),
+                      for (ToDo todo in todosList)
+                        ToDoItem(
+                          todo: todo,
+                          onToDoChanged: _handleToDoChange, 
+                          onDeleteItem: _DeleteToDoItem,
+                        ),
+                    ],
+                  ),
+                )
               ],
             ),
           ),
@@ -33,54 +54,62 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     );
   }
-
+  void _handleToDoChange (ToDo todo){
+    setState(() {
+      todo.isDone =!todo.isDone;
+    });
+  }
+  void _DeleteToDoItem (String id ){
+    setState(() {
+      todosList.removeWhere((element) => element.id == id);
+    });
+  }
   Align AddToDo() {
     return Align(
-          alignment: Alignment.bottomCenter,
-          child: Row(
-            children: [
-              Expanded(
-                  child: Container(
-                padding: EdgeInsets.symmetric(horizontal: 20, vertical: 5),
-                margin: EdgeInsets.only(bottom: 20, right: 20, left: 20),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  boxShadow: [
-                    BoxShadow(
-                        color: Colors.grey,
-                        offset: Offset(0.0, 0.0),
-                        blurRadius: 10.0,
-                        spreadRadius: 0.0),
-                  ],
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: TextField(
-                  decoration: InputDecoration(
-                    hintText: "Add a New To-Do item",
-                    border: InputBorder.none,
-                    focusedBorder: InputBorder.none,
-                  ),
-                ),
-              )),
-              Container(
-                margin: EdgeInsets.only(bottom: 20, right: 20),
-                child: ElevatedButton(
-                    onPressed: () {},
-                    child: Text(
-                      "+",
-                      style: TextStyle(fontSize: 40),
-                    ),
-                    style: ElevatedButton.styleFrom(
-                      primary: tdBlue,
-                      minimumSize: Size(60,60),
-                      elevation: 10,
-                    ),
-                    ),
-              )
-            ],
-          ),
-        );
-        
+      alignment: Alignment.bottomCenter,
+      child: Row(
+        children: [
+          Expanded(
+              child: Container(
+            padding: EdgeInsets.symmetric(horizontal: 20, vertical: 5),
+            margin: EdgeInsets.only(bottom: 20, right: 20, left: 20),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              boxShadow: [
+                BoxShadow(
+                    color: Colors.grey,
+                    offset: Offset(0.0, 0.0),
+                    blurRadius: 10.0,
+                    spreadRadius: 0.0),
+              ],
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: TextField(
+              decoration: InputDecoration(
+                hintText: "Add a New To-Do item",
+                border: InputBorder.none,
+                focusedBorder: InputBorder.none,
+              ),
+            ),
+          )),
+          Container(
+            margin: EdgeInsets.only(bottom: 20, right: 20),
+            child: ElevatedButton(
+              onPressed: () {},
+              child: Text(
+                "+",
+                style: TextStyle(fontSize: 40),
+              ),
+              style: ElevatedButton.styleFrom(
+                primary: tdBlue,
+                minimumSize: Size(60, 60),
+                elevation: 10,
+              ),
+            ),
+          )
+        ],
+      ),
+    );
   }
 
   AppBar _buildAppBar() {
@@ -100,38 +129,6 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 }
 
-class _ToDoList extends StatelessWidget {
-  const _ToDoList({
-    super.key,
-    required this.todosList,
-  });
-
-  final List<ToDo> todosList;
-
-  @override
-  Widget build(BuildContext context) {
-    return Expanded(
-      child: ListView(
-        children: [
-          Container(
-            margin: EdgeInsets.only(top: 50, bottom: 20),
-            child: Text(
-              "All To-Dos",
-              style: TextStyle(
-                fontSize: 30,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-          ),
-          for (ToDo todo in todosList)
-            ToDoItem(
-              todo: todo,
-            ),
-        ],
-      ),
-    );
-  }
-}
 
 class _searchBar extends StatelessWidget {
   const _searchBar({
