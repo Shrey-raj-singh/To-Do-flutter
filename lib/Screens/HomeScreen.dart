@@ -11,6 +11,14 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   final todosList = ToDo.todoList();
+  List<ToDo> _foundToDo = [];
+  final _addController = TextEditingController();
+
+  @override
+  void initState() {
+    _foundToDo = todosList;
+    super.initState();
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -49,23 +57,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ],
             ),
           ),
-          AddToDo(),
-        ],
-      ),
-    );
-  }
-  void _handleToDoChange (ToDo todo){
-    setState(() {
-      todo.isDone =!todo.isDone;
-    });
-  }
-  void _DeleteToDoItem (String id ){
-    setState(() {
-      todosList.removeWhere((element) => element.id == id);
-    });
-  }
-  Align AddToDo() {
-    return Align(
+          Align(
       alignment: Alignment.bottomCenter,
       child: Row(
         children: [
@@ -95,7 +87,9 @@ class _HomeScreenState extends State<HomeScreen> {
           Container(
             margin: EdgeInsets.only(bottom: 20, right: 20),
             child: ElevatedButton(
-              onPressed: () {},
+              onPressed: () {
+                _AddToDoItem(_addController.text);
+              },
               child: Text(
                 "+",
                 style: TextStyle(fontSize: 40),
@@ -109,9 +103,71 @@ class _HomeScreenState extends State<HomeScreen> {
           )
         ],
       ),
+    ),
+        ],
+      ),
     );
   }
+  void _handleToDoChange (ToDo todo){
+    setState(() {
+      todo.isDone =!todo.isDone;
+    });
+  }
+  void _DeleteToDoItem (String id ){
+    setState(() {
+      todosList.removeWhere((element) => element.id == id);
+    });
+  }
+  void _AddToDoItem (String toDo ){
+    setState(() {
+      todosList.add(ToDo(id: DateTime.now().millisecondsSinceEpoch.toString(), todoText: toDo));
+    });
+    _addController.clear();
+  }
+void _runFilter(String enteredKeyword) {
+    List<ToDo> results = [];
+    if (enteredKeyword.isEmpty) {
+      results = todosList;
+    } else {
+      results = todosList
+          .where((item) => item.todoText!
+              .toLowerCase()
+              .contains(enteredKeyword.toLowerCase()))
+          .toList();
+    }
 
+    setState(() {
+      _foundToDo = results;
+    });
+  }
+
+Widget _searchBar() {
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 15),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: TextField(
+        onChanged: (value) => _runFilter(value),
+        decoration: InputDecoration(
+          contentPadding: EdgeInsets.all(0),
+          prefixIcon: Icon(
+            Icons.search,
+            color: tdBlack,
+            size: 20,
+          ),
+          prefixIconConstraints: BoxConstraints(
+            maxHeight: 20,
+            minWidth: 25,
+          ),
+          border: InputBorder.none,
+          hintText: 'Search',
+          hintStyle: TextStyle(color: tdGrey),
+        ),
+      ),
+    );
+  }
   AppBar _buildAppBar() {
     return AppBar(
       backgroundColor: Colors.transparent,
@@ -123,41 +179,6 @@ class _HomeScreenState extends State<HomeScreen> {
             size: 27,
           ),
           backgroundColor: tdGrey,
-        ),
-      ),
-    );
-  }
-}
-
-
-class _searchBar extends StatelessWidget {
-  const _searchBar({
-    super.key,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.symmetric(horizontal: 15),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(36),
-      ),
-      child: TextField(
-        decoration: InputDecoration(
-          contentPadding: EdgeInsets.zero,
-          prefixIcon: Icon(
-            Icons.search,
-            color: tdBlack,
-            size: 20,
-          ),
-          prefixIconConstraints: BoxConstraints(
-            minWidth: 25,
-            maxHeight: 20,
-          ),
-          border: InputBorder.none,
-          hintText: 'Search..',
-          hintStyle: TextStyle(color: tdGrey),
         ),
       ),
     );
